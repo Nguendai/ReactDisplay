@@ -1,152 +1,171 @@
 import React, { Component } from 'react';
-import {
-    StyleSheet, Text, TouchableOpacity,
-    ListView, View, Image, Dimensions
+import { 
+    StyleSheet, Text, TouchableOpacity, ScrollView, View, Image, Dimensions,TextInput,ListView
 } from 'react-native';
-import global from '../../../global';
+import { Icon } from 'native-base';
 
-const url = 'http://localhost/api/images/product/';
+import sp1 from './../../../../images/temp/sp1.jpeg';
+import sp4 from '../../../../images/temp/sp4.jpeg';
+const url = 'http://10.6.4.108:8080/app/images/product/';
 
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 }
 
 class SearchView extends Component {
-    constructor(props) {
+    constructor(props){
         super(props);
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            listProduct: ds
-        };
-        global.setArraySearch = this.setSearchArray.bind(this);
+            search :'',
+            listProducts: ds,
+          } 
+          this.arr
     }
-
-    setSearchArray(arrProduct) {
-        this.setState({ listProduct: this.state.listProduct.cloneWithRows(arrProduct) });
-    }
-
+    onSearch1(){
+    console.log("_______________________");
+        
+    }    
     gotoDetail(product) {
-        const { navigator } = this.props;
-        navigator.push({ name: 'PRODUCT_DETAIL', product });
+        this.props.navigation.navigate('ProductDeatail',{ product: product })
     }
     render() {
         const {
-            product, mainRight, txtMaterial, txtColor,
-            txtName, txtPrice, productImage,
-            txtShowDetail, showDetailContainer, wrapper
+            container, header, wrapper,
+            productContainer, productImage, productInfo, lastRowInfo,
+            txtName, txtPrice, txtMaterial, txtColor,titleStyle
         } = styles;
         return (
+            <View style={container}>
             <View style={wrapper}>
-                <ListView
-                    dataSource={this.state.listProduct}
-                    renderRow={productItem => (
-                        <View style={product}>
-                            <Image source={{ uri: `${url}${productItem.images[0]}` }} style={productImage} />
-                            <View style={mainRight}>
-                                <Text style={txtName}>{toTitleCase(productItem.name)}</Text>
-                                <Text style={txtPrice}>{productItem.price}$</Text>
-                                <Text style={txtMaterial}>Material {productItem.material}</Text>
-                                <View style={{ flexDirection: 'row' }} >
-                                    <Text style={txtColor}>Color {productItem.color}</Text>
-                                    <View
-                                        style={{
-                                            height: 15,
-                                            width: 15,
-                                            backgroundColor: 'white',
-                                            borderRadius: 15,
-                                            marginLeft: 10
-                                        }}
-                                    />
-                                </View>
-                                <TouchableOpacity style={showDetailContainer} onPress={() => this.gotoDetail(productItem)}>
-                                    <Text style={txtShowDetail}>SHOW DETAILS</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    )}
+                <View style={header}>
+                <TextInput 
+                    style={styles.textInput}
+                    placeholder="What do you want to buy?"
+                    underlineColorAndroid="transparent"
+                    value={this.state.search}
+                    onChangeText={text => this.setState({ search: text })}
+                    // value={this.state.txtSearch}
+                    // onChangeText={text => this.setState({ txtSearch: text })}
+                    // onFocus={() => global.gotoSearch()} 
+                    // onSubmitEditing={this.onSearch.bind(this)}
                 />
+                 
+                    <View style={{ width: 30 }} />
+                </View>
+                <TouchableOpacity  onPress={()=>this.onSearch1.bind(this)}>
+                    <Icon name='search' style={{color:'#ff5722',fontSize:20,marginLeft:10}}/>
+                    </TouchableOpacity>
+                <ListView 
+                        removeClippedSubviews={false}
+                        dataSource={this.state.listProducts}
+                        renderRow={product => (
+                            <View style={productContainer}>
+                                <Image style={productImage} source={{ uri: `${url}${product.images[0]}` }} />
+                                <View style={productInfo}>
+                                    <Text style={txtName}>{product.name}</Text>
+                                    <Text style={txtPrice}>{product.price}$</Text>
+                                    <Text style={txtMaterial}>Material {product.material}</Text>
+                                    <View style={lastRowInfo}>
+                                        <Text style={txtColor}>Colo {product.color}</Text>
+                                        <View style={{ backgroundColor: product.color.toLowerCase(), height: 16, width: 16, borderRadius: 8 }} />
+                                        <TouchableOpacity onPress={() => this.gotoDetail(product)}>
+                                            <Text style={txtShowDetail}>SHOW DETAILS</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
+                        />
+            </View>
             </View>
         );
     }
 }
 
-const { width } = Dimensions.get('window');
+const { height,width } = Dimensions.get('window');
 const imageWidth = width / 4;
 const imageHeight = (imageWidth * 452) / 361;
 
 const styles = StyleSheet.create({
-    wrapper: {
-        backgroundColor: '#DFDFDF',
-        flex: 1
+    container: {
+        flex: 1,
+        backgroundColor: '#DBDBD8'
     },
-    product: {
+    header: {
+        height: 50,
         flexDirection: 'row',
-        margin: 10,
-        padding: 10,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 2,
-        shadowColor: '#3B5458',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 5
+    },
+    wrapper: {
+        backgroundColor: '#fff',
+        shadowColor: '#2E272B',
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2
+        shadowOpacity: 0.2,
+        margin: 10,
+        paddingHorizontal: 10
+    },
+    backStyle: {
+        width: 30,
+        height: 30
+    },
+    textInput: { 
+        height: height / 23, 
+        width:width- 120,
+        backgroundColor: '#FFF', 
+        paddingLeft: 10,
+        paddingVertical: 0 
+    },
+    productContainer: {
+        flexDirection: 'row',
+        paddingVertical: 15,
+        borderTopColor: '#F0F0F0',
+        borderBottomColor: '#FFF',
+        borderLeftColor: '#FFF',
+        borderRightColor: '#FFF',
+        borderWidth: 1
+    },
+    titleStyle: {
+        fontFamily: 'Avenir',
+        color: '#B10D65',
+        fontSize: 20
     },
     productImage: {
-        width: imageWidth,
-        height: imageHeight,
-        flex: 1,
-        resizeMode: 'center'
+        width: 90,
+        height: (90 * 452) / 361
     },
-    mainRight: {
-        flex: 3,
-        justifyContent: 'space-between'
+    productInfo: {
+        justifyContent: 'space-between',
+        marginLeft: 15,
+        flex: 1
     },
-    productController: {
-        flexDirection: 'row'
-    },
-    numberOfProduct: {
-        flex: 1,
+    lastRowInfo: {
         flexDirection: 'row',
-        justifyContent: 'space-around'
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     txtName: {
-        paddingLeft: 20,
-        color: '#A7A7A7',
+        fontFamily: 'Avenir',
+        color: '#BCBCBC',
         fontSize: 20,
-        fontWeight: '400',
-        fontFamily: 'Avenir'
+        fontWeight: '400'
     },
     txtPrice: {
-        paddingLeft: 20,
-        color: '#C21C70',
-        fontSize: 15,
-        fontWeight: '400',
+        fontFamily: 'Avenir',
+        color: '#B10D65',
+    },
+    txtMaterial: {
         fontFamily: 'Avenir'
     },
     txtColor: {
-        paddingLeft: 20,
-        color: 'black',
-        fontSize: 15,
-        fontWeight: '400',
-        fontFamily: 'Avenir'
-    },
-    txtMaterial: {
-        paddingLeft: 20,
-        color: 'black',
-        fontSize: 15,
-        fontWeight: '400',
         fontFamily: 'Avenir'
     },
     txtShowDetail: {
-        color: '#C21C70',
-        fontSize: 10,
-        fontWeight: '400',
         fontFamily: 'Avenir',
-        textAlign: 'right',
-    },
-    showDetailContainer: {
-        flexDirection: 'row',
-        position: 'absolute',
-        alignSelf: 'flex-end',
-        marginTop: 100
+        color: '#B10D65',
+        fontSize: 11
     }
 });
 

@@ -4,6 +4,9 @@ import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-nativ
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Sae } from 'react-native-textinput-effects';
 import { Makiko } from 'react-native-textinput-effects';
+import singIn from '../../api/signIn';
+import global from '../../global';
+import saveToken from '../../api/saveToken';
 
 export default class SignIn extends Component {
     constructor(props) {
@@ -12,10 +15,35 @@ export default class SignIn extends Component {
             email: '',
             password: ''
         };
+
     }
 
     onSignIn() {
         const { email, password } = this.state;
+        singIn(email,password)
+        .then(res =>{
+            console.log(res.user);
+          global.onSignIn(res.user);
+          saveToken(res.token);
+        })
+        .catch(error =>{
+            console.log(error);
+            
+        })
+    }
+    onFail() {
+        Alert.alert(
+            'Notice',
+            'Email has been used by other',
+            [
+                { text: 'OK', onPress: () => this.removeEmail.bind(this) }
+            ],
+            { cancelable: false }
+        );
+    }
+
+    removeEmail() {
+        this.setState({ email: '', password : ''});
     }
 
     render() {
@@ -23,25 +51,21 @@ export default class SignIn extends Component {
         const { email, password } = this.state;
         return (
             <View >
-                 <Sae
-                    
-                    label={'Email Address'}
-                    iconClass={FontAwesomeIcon}
-                    iconName={'pencil'}
-                    iconColor={'white'}
-                    // TextInput props
-                    autoCapitalize={'none'}
-                    autoCorrect={false}
-                    />
-                    <Sae
-                    label={'Enter your password'}
-                    iconClass={FontAwesomeIcon}
-                    iconName={'pencil'}
-                    iconColor={'white'}
-                    // TextInput props
-                    autoCapitalize={'none'}
-                    autoCorrect={false}
-                    />
+                <TextInput 
+                    style={inputStyle} 
+                    placeholder="Enter your email" 
+                    value={this.state.email}
+                    onChangeText={text => this.setState({ email: text })}
+                    underlineColorAndroid="transparent"
+                />
+                <TextInput
+                    style={inputStyle}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={text => this.setState({ password: text })}
+                    secureTextEntry
+                    underlineColorAndroid="transparent"
+                />
               
                 <TouchableOpacity style={bigButton} onPress={this.onSignIn.bind(this)}>
                     <Text style={buttonText}>SIGN IN NOW</Text>

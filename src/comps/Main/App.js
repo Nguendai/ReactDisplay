@@ -8,11 +8,15 @@ import LoginScreen from '../Authentication/LoginScreen';
 import ChangeInfo from '../ChangeInfo/ChangeInfo';
 import OrderHistory from '../OrderHistory/OrderHistory';
 import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
+import global from '../../global';
+import checkLogin from '../../api/checkLogin';
+import getToken from '../../api/getToken';
 const CustomDrawerContentComponent = (props) => (
   <Container>
     <Header style={{height:150}} >
       <Body>
-        <Image source={require('../../images/b.jpg')} style={{height:150,width:150}}/>
+        <Image source={require('../../images/b.jpg')} style={{height:100,width:150}}/>
+       
       </Body>
     </Header>
     <Content>
@@ -20,13 +24,28 @@ const CustomDrawerContentComponent = (props) => (
     </Content>
   </Container>
 )
+
+
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { isLogedIn: false };
-}
+    this.state = { user: null }; 
+    global.onSignIn =this.onSingin.bind(this);
+  }
+  onSingin(user){
+    this.setState({user});
+  }
+ 
+  // componentDidMount() {
+  //   getToken()
+  //   .then(token => checkLogin(token))
+  //   .then(res => {
+  //       global.onSignIn(user);
+  //   })
+  // }  
+
   render(){ 
-    const mainJSX = this.state.isLogedIn ? <MyApp/> : <MySingin/>;
+    const mainJSX = this.state.user ? <MyApp screenProps ={{user: this.state.user}} /> : <MySingin/>;
     return(
       <Container>
           {mainJSX}
@@ -40,8 +59,7 @@ export default class App extends Component {
 const MyApp = DrawerNavigator({
   Home: Shop,
   ChangeInfo:ChangeInfo,
-  OrderHistory:OrderHistory
-
+  OrderHistory:OrderHistory,
 },{
   initialRouteName:'Home',
   contentComponent:CustomDrawerContentComponent,
@@ -56,7 +74,7 @@ const MySingin = DrawerNavigator({
   LoginScreen:LoginScreen,
 
 },{
-  initialRouteName:'LoginScreen',
+  initialRouteName:'Home',
   contentComponent:CustomDrawerContentComponent,
   drawerOpenRounte:'DrawerOpen',
   drawerCloseRounte:'DrawerClose',

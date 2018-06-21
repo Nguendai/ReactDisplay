@@ -2,20 +2,22 @@ import React, { Component } from 'react';
 import { 
     View, Text, StyleSheet, Image, Dimensions, ScrollView, TouchableOpacity 
 } from 'react-native';
-import global from '../../../global';
-
-const back = require('../../../../media/appIcon/back.png');
-const cart = require('../../../../media/appIcon/cartfull.png');
-
-const url = 'http://localhost/api/images/product/';
-
+import global from '../../../../global';
+import back from  '../../../../images/back.png';
+import cart from '../../../../images/cartfull.png';
+const uri1 = 'http://10.6.4.108:8080/app/images/product/';
 export default class ProductDetail extends Component {
+    constructor(){
+        super();
+        this.state = {
+        };
+    }
     goBack() {
-        const { navigator } = this.props;
-        navigator.pop();
+        this.props.navigation.goBack();  
     }
     addThisProductToCart() {
-        const { product } = this.props;
+        const { navigation } = this.props;
+        const product = navigation.getParam('product');
         global.addProductToCart(product);
     }
     render() {
@@ -26,7 +28,9 @@ export default class ProductDetail extends Component {
             textSmoke, textHighlight, textMain, titleContainer,
             descContainer, productImageStyle, descStyle, txtMaterial, txtColor
         } = styles;
-        const { name, price, color, material, description, images } = this.props.product;
+        const { navigation } = this.props;
+        const product = navigation.getParam('product');
+
         return (
             <View style={wrapper}>
                 <View style={cardStyle}>
@@ -40,25 +44,25 @@ export default class ProductDetail extends Component {
                     </View>
                     <View style={imageContainer}>
                         <ScrollView style={{ flexDirection: 'row', padding: 10, height: swiperHeight }} horizontal >
-                            <Image source={{ uri: `${url}${images[0]}` }} style={productImageStyle} />
-                            <Image source={{ uri: `${url}${images[1]}` }} style={productImageStyle} />
+                            <Image source={{uri:`${uri1}${product.images[0]}`}} style={productImageStyle} />
+                             <Image source={{uri:`${uri1}${product.images[1]}`}} style={productImageStyle} />
                         </ScrollView>
                     </View>
                     <View style={footer}>
                         <View style={titleContainer}>
                             <Text style={textMain}>
-                                <Text style={textBlack}>{name.toUpperCase()}</Text>
+                                <Text style={textBlack}>{product.name.toUpperCase()}</Text>
                                 <Text style={textHighlight}> / </Text>
-                                <Text style={textSmoke}>{price}$</Text>
+                                <Text style={textSmoke}>{product.price}  $</Text>
                             </Text>
                         </View>
                         <View style={descContainer}>
-                            <Text style={descStyle}>{description}</Text>
+                            <Text style={descStyle}>{product.description}</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 15 }}>
-                                <Text style={txtMaterial}>Material {material}</Text>
+                                <Text style={txtMaterial}>{product.material}</Text>
                                 <View style={{ flexDirection: 'row' }} >
-                                    <Text style={txtColor}>Color {color}</Text>
-                                    <View style={{ height: 15, width: 15, backgroundColor: color.toLowerCase(), borderRadius: 15, marginLeft: 10, borderWidth: 1, borderColor: '#C21C70' }} />
+                                    <Text style={txtColor}>{product.color}</Text>
+                                    <View style={{ height: 15, width: 15, backgroundColor: product.color.toLowerCase(), borderRadius: 15, marginLeft: 10, borderWidth: 1, borderColor: '#C21C70' }} />
                                 </View>
                             </View>
                         </View>

@@ -52,11 +52,11 @@ export default class LoginScreen extends Component {
             activeStyle, inactiveStyle
         } = styles;
         const { isSignIn } = this.state;
-        const mainJSX = isSignIn ? <SignIn goBackToMain={this.props.navigation.navigate('Home')} /> : <SignUp gotoSignIn={this.gotoSignIn.bind(this)} />;
+        const mainJSX = isSignIn ? <SignIn  /> : <SignUp gotoSignIn={this.gotoSignIn.bind(this)} />;
         return (
             <View style={container}>
                 <View style={row1}>
-                    <TouchableOpacity onPress={this.onSignIn.bind(this)}>
+                    <TouchableOpacity onPress= {() => this.props.navigation.navigate('Home')}>
                         <Image source={icBack} style={iconStyle} />
                     </TouchableOpacity>
                     <Text style={titleStyle}>Wearing a Dress</Text>
